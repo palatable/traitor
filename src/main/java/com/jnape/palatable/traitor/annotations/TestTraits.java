@@ -10,6 +10,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target(METHOD)
 @Retention(RUNTIME)
-public @interface Traits {
+public @interface TestTraits {
     public Class<? extends Trait>[] value();
 }

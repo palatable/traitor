@@ -1,6 +1,6 @@
 package com.jnape.palatable.traitor.runners;
 
-import com.jnape.palatable.traitor.annotations.Traits;
+import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.framework.TraitFrameworkMethod;
 import com.jnape.palatable.traitor.traits.Trait;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -9,9 +9,9 @@ import org.junit.runners.model.InitializationError;
 
 import java.util.List;
 
-public class TraitsRunner extends BlockJUnit4ClassRunner {
+public class Traits extends BlockJUnit4ClassRunner {
 
-    public TraitsRunner(Class<?> testClass) throws InitializationError {
+    public Traits(Class<?> testClass) throws InitializationError {
         super(testClass);
     }
 
@@ -23,11 +23,11 @@ public class TraitsRunner extends BlockJUnit4ClassRunner {
     }
 
     private void addTraitTestingMethods(List<FrameworkMethod> testMethods) {
-        List<FrameworkMethod> traitTestSubjectCreationMethods = getTestClass().getAnnotatedMethods(Traits.class);
+        List<FrameworkMethod> traitTestSubjectCreationMethods = getTestClass().getAnnotatedMethods(TestTraits.class);
         for (FrameworkMethod traitTestSubjectCreationMethod : traitTestSubjectCreationMethods)
             try {
                 Object testSubject = traitTestSubjectCreationMethod.invokeExplosively(createTest());
-                for (Class<? extends Trait> traitClass : traitTestSubjectCreationMethod.getAnnotation(Traits.class).value()) {
+                for (Class<? extends Trait> traitClass : traitTestSubjectCreationMethod.getAnnotation(TestTraits.class).value()) {
                     TraitFrameworkMethod traitFrameworkMethod = TraitFrameworkMethod.forClass(traitClass, testSubject);
                     testMethods.remove(traitFrameworkMethod);
                     testMethods.add(traitFrameworkMethod);

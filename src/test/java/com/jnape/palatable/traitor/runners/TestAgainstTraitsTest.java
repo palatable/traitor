@@ -19,28 +19,29 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 
-public class TraitsRunnerTest {
+public class TestAgainstTraitsTest {
 
     @Test
     public void passesInitializationIfOneTestMethodAndNoTraitMethods() throws InitializationError {
-        new TraitsRunner(TestSuiteWithSingleTestMethod.class);
+        new Traits(TestSuiteWithSingleTestMethod.class);
     }
 
     @Test
     public void passesInitializationIfOneTraitMethodAndNoTestMethods() throws InitializationError {
-        new TraitsRunner(TestSuiteWithSingleTraitMethod.class);
+        new Traits(TestSuiteWithSingleTraitMethod.class);
     }
 
     @Test
     public void passesInitializationIfOneTestMethodAndOneTraitMethod() throws InitializationError {
-        new TraitsRunner(TestSuiteWithOneTestMethodAndOneTraitMethod.class);
+        new Traits(TestSuiteWithOneTestMethodAndOneTraitMethod.class);
     }
 
     @Test(expected = InitializationError.class)
     public void failsInitializationIfNoTestMethodsAndNoTraitMethods() throws InitializationError {
-        new TraitsRunner(TestSuiteWithNoMethods.class);
+        new Traits(TestSuiteWithNoMethods.class);
     }
 
     @Test
@@ -48,7 +49,7 @@ public class TraitsRunnerTest {
         RunNotifier notifier = mock(RunNotifier.class);
         Class<TestSuiteWithOneTestMethodAndOneTraitMethod> testClass = TestSuiteWithOneTestMethodAndOneTraitMethod.class;
 
-        new TraitsRunner(testClass).run(notifier);
+        new Traits(testClass).run(notifier);
 
         InOrder inOrder = inOrder(notifier);
 
@@ -70,7 +71,7 @@ public class TraitsRunnerTest {
     @Test
     public void includesTraitMethodsInComputedTestMethods() throws Exception {
         List<Integer> testSubject = asList(2, 4, 6, 8, 10);
-        List<FrameworkMethod> computedTestMethods = new TraitsRunner(TestSuiteWithOneTestMethodAndOneTraitMethod.class).computeTestMethods();
+        List<FrameworkMethod> computedTestMethods = new Traits(TestSuiteWithOneTestMethodAndOneTraitMethod.class).computeTestMethods();
 
         assertThat(
                 computedTestMethods,

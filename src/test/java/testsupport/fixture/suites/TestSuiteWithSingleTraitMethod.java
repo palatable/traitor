@@ -1,6 +1,6 @@
 package testsupport.fixture.suites;
 
-import com.jnape.palatable.traitor.annotations.Traits;
+import com.jnape.palatable.traitor.annotations.TestTraits;
 import testsupport.fixture.traits.Evens;
 import testsupport.fixture.traits.NonEmpty;
 
@@ -10,7 +10,8 @@ import static java.util.Arrays.asList;
 
 public class TestSuiteWithSingleTraitMethod {
 
-    @Traits({NonEmpty.class, Evens.class})
+    @SuppressWarnings("UnusedDeclaration")
+    @TestTraits({NonEmpty.class, Evens.class})
     public List<Integer> createTestSubject() {
         return asList(2, 4, 6, 8, 10);
     }
