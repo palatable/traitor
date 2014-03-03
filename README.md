@@ -30,7 +30,7 @@ public class FunctionalIterableTest {
 ```
 
 ```Java
-public class Laziness extends Trait<FunctionalIterable> {
+public class Laziness implements Trait<FunctionalIterable> {
 
     @Override
     public void test(FunctionalIterable testSubject) {
