@@ -22,7 +22,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 
-public class TestAgainstTraitsTest {
+public class TraitsTest {
 
     @Test
     public void passesInitializationIfOneTestMethodAndNoTraitMethods() throws InitializationError {
@@ -76,8 +76,8 @@ public class TestAgainstTraitsTest {
         assertThat(
                 computedTestMethods,
                 CoreMatchers.<FrameworkMethod>hasItems(
-                        TraitFrameworkMethod.forClass(NonEmpty.class, testSubject),
-                        TraitFrameworkMethod.forClass(Evens.class, testSubject)
+                        TraitFrameworkMethod.synthesize(NonEmpty.class, testSubject),
+                        TraitFrameworkMethod.synthesize(Evens.class, testSubject)
                 )
         );
     }

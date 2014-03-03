@@ -28,7 +28,7 @@ public class Traits extends BlockJUnit4ClassRunner {
             try {
                 Object testSubject = traitTestSubjectCreationMethod.invokeExplosively(createTest());
                 for (Class<? extends Trait> traitClass : traitTestSubjectCreationMethod.getAnnotation(TestTraits.class).value()) {
-                    TraitFrameworkMethod traitFrameworkMethod = TraitFrameworkMethod.forClass(traitClass, testSubject);
+                    TraitFrameworkMethod traitFrameworkMethod = TraitFrameworkMethod.synthesize(traitClass, testSubject);
                     testMethods.remove(traitFrameworkMethod);
                     testMethods.add(traitFrameworkMethod);
                 }

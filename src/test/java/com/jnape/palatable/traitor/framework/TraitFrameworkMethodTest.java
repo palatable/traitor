@@ -1,6 +1,6 @@
 package com.jnape.palatable.traitor.framework;
 
-import com.jnape.palatable.traitor.framework.exception.TraitFrameworkMethodSynthesizationException;
+import com.jnape.palatable.traitor.framework.exception.TraitFrameworkMethodSynthesisException;
 import org.junit.Test;
 import testsupport.fixture.traits.NonEmpty;
 
@@ -33,12 +33,12 @@ public class TraitFrameworkMethodTest {
         Method testMethod = NonEmpty.class.getDeclaredMethod("test", Object.class);
 
         TraitFrameworkMethod nonEmpty = new TraitFrameworkMethod(testMethod, testSubject);
-        assertThat(nonEmpty, is(TraitFrameworkMethod.forClass(NonEmpty.class, testSubject)));
+        assertThat(nonEmpty, is(TraitFrameworkMethod.synthesize(NonEmpty.class, testSubject)));
     }
 
-    @Test(expected = TraitFrameworkMethodSynthesizationException.class)
+    @Test(expected = TraitFrameworkMethodSynthesisException.class)
     @SuppressWarnings("unchecked")
     public void failsIfTraitTestMethodRetrievalFails() {
-        TraitFrameworkMethod.forClass((Class) Object.class, null);
+        TraitFrameworkMethod.synthesize((Class) Object.class, null);
     }
 }

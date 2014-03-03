@@ -1,6 +1,6 @@
 package com.jnape.palatable.traitor.framework;
 
-import com.jnape.palatable.traitor.framework.exception.TraitFrameworkMethodSynthesizationException;
+import com.jnape.palatable.traitor.framework.exception.TraitFrameworkMethodSynthesisException;
 import com.jnape.palatable.traitor.traits.Trait;
 import org.junit.runners.model.FrameworkMethod;
 
@@ -43,12 +43,12 @@ public class TraitFrameworkMethod extends FrameworkMethod {
         return false;
     }
 
-    public static TraitFrameworkMethod forClass(Class<? extends Trait> traitClass,
-                                                Object testSubject) throws TraitFrameworkMethodSynthesizationException {
+    public static TraitFrameworkMethod synthesize(Class<? extends Trait> traitClass,
+                                                  Object testSubject) throws TraitFrameworkMethodSynthesisException {
         try {
             return new TraitFrameworkMethod(traitClass.getDeclaredMethod(TEST_METHOD_NAME, Object.class), testSubject);
         } catch (Exception e) {
-            throw new TraitFrameworkMethodSynthesizationException(traitClass, e);
+            throw new TraitFrameworkMethodSynthesisException(traitClass, e);
         }
     }
 }
