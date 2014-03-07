@@ -6,7 +6,15 @@ Trait testing with JUnit.
 installation
 ------------
 
-Traitor is currently in development and hasn't yet been released. As soon as it is, I'll add the POM `<dependency>` tag here.
+Add the following dependency to your `pom.xml` file:
+
+```xml
+<dependency>
+    <groupId>com.jnape.palatable</groupId>
+    <artifactId>traitor</artifactId>
+    <version>1.0</version>
+</dependency>
+```
 
 usage
 -----
