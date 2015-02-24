@@ -13,10 +13,12 @@ public class TraitFrameworkMethod extends FrameworkMethod {
 
     public static final String TEST_METHOD_NAME = "test";
 
-    private final Object testSubject;
+    private final FrameworkMethod traitTestSubjectCreationMethod;
+    private final Object          testSubject;
 
-    public TraitFrameworkMethod(Method method, Object testSubject) {
+    public TraitFrameworkMethod(FrameworkMethod traitTestSubjectCreationMethod, Method method, Object testSubject) {
         super(method);
+        this.traitTestSubjectCreationMethod = traitTestSubjectCreationMethod;
         this.testSubject = testSubject;
     }
 
@@ -38,15 +40,16 @@ public class TraitFrameworkMethod extends FrameworkMethod {
     public boolean equals(Object other) {
         if (other instanceof TraitFrameworkMethod) {
             TraitFrameworkMethod that = (TraitFrameworkMethod) other;
-            return super.equals(other) && this.testSubject.equals(that.testSubject);
+            return super.equals(other) && this.traitTestSubjectCreationMethod.equals(that.traitTestSubjectCreationMethod);
         }
         return false;
     }
 
     public static TraitFrameworkMethod synthesize(Class<? extends Trait> traitClass,
+                                                  FrameworkMethod traitTestSubjectCreationMethod,
                                                   Object testSubject) throws TraitFrameworkMethodSynthesisException {
         try {
-            return new TraitFrameworkMethod(traitClass.getDeclaredMethod(TEST_METHOD_NAME, Object.class), testSubject);
+            return new TraitFrameworkMethod(traitTestSubjectCreationMethod, traitClass.getDeclaredMethod(TEST_METHOD_NAME, Object.class), testSubject);
         } catch (Exception e) {
             throw new TraitFrameworkMethodSynthesisException(traitClass, e);
         }

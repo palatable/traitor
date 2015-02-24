@@ -1,5 +1,6 @@
 package com.jnape.palatable.traitor.runners;
 
+import com.jnape.palatable.traitor.annotations.TestTraits;
 import com.jnape.palatable.traitor.framework.TraitFrameworkMethod;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.junit.runners.model.InitializationError;
 import org.mockito.InOrder;
 import testsupport.fixture.suites.TestSuiteWithNoMethods;
 import testsupport.fixture.suites.TestSuiteWithOneTestMethodAndOneTraitMethod;
+import testsupport.fixture.suites.TestSuiteWithOneTraitMethodForReferentialEqualityTestSubject;
 import testsupport.fixture.suites.TestSuiteWithSingleTestMethod;
 import testsupport.fixture.suites.TestSuiteWithSingleTraitMethod;
 import testsupport.fixture.traits.Evens;
@@ -18,6 +20,7 @@ import testsupport.fixture.traits.NonEmpty;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -70,15 +73,27 @@ public class TraitsTest {
 
     @Test
     public void includesTraitMethodsInComputedTestMethods() throws Exception {
+        Traits traits = new Traits(TestSuiteWithOneTestMethodAndOneTraitMethod.class);
+
         List<Integer> testSubject = asList(2, 4, 6, 8, 10);
-        List<FrameworkMethod> computedTestMethods = new Traits(TestSuiteWithOneTestMethodAndOneTraitMethod.class).computeTestMethods();
+
+        FrameworkMethod traitTestSubjectCreationMethod = traits.getTestClass().getAnnotatedMethods(TestTraits.class).get(0);
 
         assertThat(
-                computedTestMethods,
+                traits.computeTestMethods(),
                 CoreMatchers.<FrameworkMethod>hasItems(
-                        TraitFrameworkMethod.synthesize(NonEmpty.class, testSubject),
-                        TraitFrameworkMethod.synthesize(Evens.class, testSubject)
+                        TraitFrameworkMethod.synthesize(NonEmpty.class, traitTestSubjectCreationMethod, testSubject),
+                        TraitFrameworkMethod.synthesize(Evens.class, traitTestSubjectCreationMethod, testSubject)
                 )
         );
+    }
+
+    @Test
+    public void doesNotRelyOnValueEqualityOfTestSubjectToDeDuplicateTraitFrameworkMethods() throws InitializationError {
+        Traits traits = new Traits(TestSuiteWithOneTraitMethodForReferentialEqualityTestSubject.class);
+        traits.computeTestMethods();
+        traits.computeTestMethods();
+
+        assertThat(traits.computeTestMethods().size(), is(2));
     }
 }

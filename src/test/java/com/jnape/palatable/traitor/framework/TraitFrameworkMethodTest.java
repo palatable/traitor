@@ -2,6 +2,7 @@ package com.jnape.palatable.traitor.framework;
 
 import com.jnape.palatable.traitor.framework.exception.TraitFrameworkMethodSynthesisException;
 import org.junit.Test;
+import org.junit.runners.model.FrameworkMethod;
 import testsupport.fixture.traits.NonEmpty;
 
 import java.lang.reflect.Method;
@@ -13,32 +14,42 @@ import static org.junit.Assert.assertThat;
 public class TraitFrameworkMethodTest {
 
     @Test
-    public void equalsOtherWithSameMethodAndTestSubject() throws Exception {
-        Object testSubject = new Object();
-        Object differentTestSubject = new Object();
+    public void equalsOtherWithSameMethodAndTraitTestSubjectCreationMethod() throws Exception {
+        Method wait = Object.class.getDeclaredMethod("wait");
         Method toString = Object.class.getDeclaredMethod("toString");
         Method finalize = Object.class.getDeclaredMethod("finalize");
 
-        TraitFrameworkMethod nonEmpty = new TraitFrameworkMethod(toString, testSubject);
+        FrameworkMethod traitTestSubjectCreationMethod = new FrameworkMethod(wait);
+        FrameworkMethod differentTraitTestSubjectCreationMethod = new FrameworkMethod(toString);
 
-        assertThat(nonEmpty, is(new TraitFrameworkMethod(toString, testSubject)));
-        assertThat(nonEmpty, is(not(new TraitFrameworkMethod(toString, differentTestSubject))));
-        assertThat(nonEmpty, is(not(new TraitFrameworkMethod(finalize, testSubject))));
-        assertThat(nonEmpty, is(not(new TraitFrameworkMethod(finalize, differentTestSubject))));
+        Object testSubject = new Object();
+
+        TraitFrameworkMethod nonEmpty = new TraitFrameworkMethod(traitTestSubjectCreationMethod, toString, testSubject);
+
+        assertThat(nonEmpty, is(new TraitFrameworkMethod(traitTestSubjectCreationMethod, toString, testSubject)));
+        assertThat(nonEmpty, is(not(new TraitFrameworkMethod(differentTraitTestSubjectCreationMethod, toString, testSubject))));
+        assertThat(nonEmpty, is(not(new TraitFrameworkMethod(traitTestSubjectCreationMethod, finalize, testSubject))));
+        assertThat(nonEmpty, is(not(new TraitFrameworkMethod(differentTraitTestSubjectCreationMethod, finalize, testSubject))));
     }
 
     @Test
-    public void creatableFromTraitClassAndTestSubject() throws Exception {
+    public void creatableFromTraitClassAndTraitTestSubjectCreationMethodAndTestSubject() throws Exception {
         Object testSubject = new Object();
         Method testMethod = NonEmpty.class.getDeclaredMethod("test", Object.class);
 
-        TraitFrameworkMethod nonEmpty = new TraitFrameworkMethod(testMethod, testSubject);
-        assertThat(nonEmpty, is(TraitFrameworkMethod.synthesize(NonEmpty.class, testSubject)));
+        Method wait = Object.class.getDeclaredMethod("wait");
+        FrameworkMethod traitTestSubjectCreationMethod = new FrameworkMethod(wait);
+
+        TraitFrameworkMethod nonEmpty = new TraitFrameworkMethod(traitTestSubjectCreationMethod, testMethod, testSubject);
+        assertThat(nonEmpty, is(TraitFrameworkMethod.synthesize(NonEmpty.class, traitTestSubjectCreationMethod, testSubject)));
     }
 
     @Test(expected = TraitFrameworkMethodSynthesisException.class)
     @SuppressWarnings("unchecked")
-    public void failsIfTraitTestMethodRetrievalFails() {
-        TraitFrameworkMethod.synthesize((Class) Object.class, null);
+    public void failsIfTraitTestMethodRetrievalFails() throws NoSuchMethodException {
+        Method wait = Object.class.getDeclaredMethod("wait");
+        FrameworkMethod traitTestSubjectCreationMethod = new FrameworkMethod(wait);
+
+        TraitFrameworkMethod.synthesize((Class) Object.class, traitTestSubjectCreationMethod, null);
     }
 }
