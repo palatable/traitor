@@ -12,7 +12,7 @@ public class EvenMatcher extends BaseMatcher<Integer> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("foo");
+        description.appendText("even");
     }
 
     public static EvenMatcher even() {

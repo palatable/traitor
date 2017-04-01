@@ -7,25 +7,32 @@ import org.junit.runners.model.FrameworkMethod;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static com.jnape.palatable.traitor.framework.Subjects.subjects;
 import static java.lang.String.format;
 
 public class TraitFrameworkMethod extends FrameworkMethod {
 
-    public static final String TEST_METHOD_NAME = "test";
+    private static final String TEST_METHOD_NAME = "test";
 
-    private final FrameworkMethod traitTestSubjectCreationMethod;
-    private final Object          testSubject;
+    private final Object testSubject;
 
-    public TraitFrameworkMethod(FrameworkMethod traitTestSubjectCreationMethod, Method method, Object testSubject) {
+    TraitFrameworkMethod(Method method, Object testSubject) {
         super(method);
-        this.traitTestSubjectCreationMethod = traitTestSubjectCreationMethod;
         this.testSubject = testSubject;
     }
 
     @Override
     public Object invokeExplosively(Object target, Object... params) throws Throwable {
         try {
-            return getMethod().invoke(getMethod().getDeclaringClass().newInstance(), testSubject);
+            Method method = getMethod();
+            Class<?> declaringClass = method.getDeclaringClass();
+            Subjects subjects = testSubject instanceof Subjects
+                    ? (Subjects) testSubject
+                    : subjects(testSubject);
+            for (Object subject : subjects) {
+                method.invoke(declaringClass.newInstance(), subject);
+            }
+            return null;
         } catch (InvocationTargetException e) {
             throw e.getTargetException();
         }
@@ -38,18 +45,13 @@ public class TraitFrameworkMethod extends FrameworkMethod {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof TraitFrameworkMethod) {
-            TraitFrameworkMethod that = (TraitFrameworkMethod) other;
-            return super.equals(other) && this.traitTestSubjectCreationMethod.equals(that.traitTestSubjectCreationMethod);
-        }
-        return false;
+        return other instanceof TraitFrameworkMethod && super.equals(other);
     }
 
     public static TraitFrameworkMethod synthesize(Class<? extends Trait> traitClass,
-                                                  FrameworkMethod traitTestSubjectCreationMethod,
                                                   Object testSubject) throws TraitFrameworkMethodSynthesisException {
         try {
-            return new TraitFrameworkMethod(traitTestSubjectCreationMethod, traitClass.getDeclaredMethod(TEST_METHOD_NAME, Object.class), testSubject);
+            return new TraitFrameworkMethod(traitClass.getDeclaredMethod(TEST_METHOD_NAME, Object.class), testSubject);
         } catch (Exception e) {
             throw new TraitFrameworkMethodSynthesisException(traitClass, e);
         }

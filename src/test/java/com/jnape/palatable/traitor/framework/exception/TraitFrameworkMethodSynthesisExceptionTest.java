@@ -1,6 +1,5 @@
 package com.jnape.palatable.traitor.framework.exception;
 
-import org.hamcrest.core.Is;
 import org.junit.Test;
 import testsupport.fixture.traits.NonEmpty;
 
@@ -27,6 +26,6 @@ public class TraitFrameworkMethodSynthesisExceptionTest {
                 cause
         );
 
-        assertThat(exception.getCause(), Is.<Throwable>is(cause));
+        assertThat(exception.getCause(), is(cause));
     }
 }
