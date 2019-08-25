@@ -14,10 +14,12 @@ public class TraitFrameworkMethod extends FrameworkMethod {
 
     private static final String TEST_METHOD_NAME = "test";
 
-    private final Object testSubject;
+    private final Class<?> traitClass;
+    private final Object   testSubject;
 
-    TraitFrameworkMethod(Method method, Object testSubject) {
+    TraitFrameworkMethod(Method method, Class<?> traitClass, Object testSubject) {
         super(method);
+        this.traitClass = traitClass;
         this.testSubject = testSubject;
     }
 
@@ -25,12 +27,11 @@ public class TraitFrameworkMethod extends FrameworkMethod {
     public Object invokeExplosively(Object target, Object... params) throws Throwable {
         try {
             Method method = getMethod();
-            Class<?> declaringClass = method.getDeclaringClass();
             Subjects subjects = testSubject instanceof Subjects
-                    ? (Subjects) testSubject
-                    : subjects(testSubject);
+                                ? (Subjects<?>) testSubject
+                                : subjects(testSubject);
             for (Object subject : subjects) {
-                method.invoke(declaringClass.newInstance(), subject);
+                method.invoke(traitClass.newInstance(), subject);
             }
             return null;
         } catch (InvocationTargetException e) {
@@ -40,18 +41,27 @@ public class TraitFrameworkMethod extends FrameworkMethod {
 
     @Override
     public String getName() {
-        return format("Trait: %s", getMethod().getDeclaringClass().getSimpleName());
+        return format("Trait: %s", traitClass.getSimpleName());
     }
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof TraitFrameworkMethod && super.equals(other);
+        return other instanceof TraitFrameworkMethod
+                && super.equals(other)
+                && traitClass.equals(((TraitFrameworkMethod) other).traitClass);
     }
 
     public static TraitFrameworkMethod synthesize(Class<? extends Trait> traitClass,
-                                                  Object testSubject) throws TraitFrameworkMethodSynthesisException {
+                                                  Object testSubject)
+            throws TraitFrameworkMethodSynthesisException {
         try {
-            return new TraitFrameworkMethod(traitClass.getDeclaredMethod(TEST_METHOD_NAME, Object.class), testSubject);
+            return new TraitFrameworkMethod(traitClass.getDeclaredMethod(TEST_METHOD_NAME, Object.class), traitClass, testSubject);
+        } catch (NoSuchMethodException e) {
+            try {
+                return new TraitFrameworkMethod(traitClass.getMethod(TEST_METHOD_NAME, Object.class), traitClass, testSubject);
+            } catch (Exception ex) {
+                throw new TraitFrameworkMethodSynthesisException(traitClass, ex);
+            }
         } catch (Exception e) {
             throw new TraitFrameworkMethodSynthesisException(traitClass, e);
         }

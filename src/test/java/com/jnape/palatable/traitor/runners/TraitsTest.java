@@ -6,8 +6,10 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.mockito.InOrder;
+import testsupport.fixture.suites.TestSuiteTwoInheritedTraitMethods;
 import testsupport.fixture.suites.TestSuiteWithNoMethods;
 import testsupport.fixture.suites.TestSuiteWithOneTestMethodAndOneTraitMethod;
 import testsupport.fixture.suites.TestSuiteWithOneTraitMethodForMultipleSubjects;
@@ -53,7 +55,7 @@ public class TraitsTest {
 
     @Test
     public void runsTraitMethodsAfterTestMethods() throws InitializationError {
-        RunNotifier notifier = mock(RunNotifier.class);
+        RunNotifier                                        notifier  = mock(RunNotifier.class);
         Class<TestSuiteWithOneTestMethodAndOneTraitMethod> testClass = TestSuiteWithOneTestMethodAndOneTraitMethod.class;
 
         new Traits(testClass).run(notifier);
@@ -99,12 +101,12 @@ public class TraitsTest {
 
     @Test
     public void supportsMultipleTestSubjectsPerTraitMethodViaSubjects() throws InitializationError {
-        Traits traits = new Traits(TestSuiteWithOneTraitMethodForMultipleSubjects.class);
+        Traits        traits   = new Traits(TestSuiteWithOneTraitMethodForMultipleSubjects.class);
         AtomicInteger testsRun = new AtomicInteger(0);
         traits.run(new RunNotifier() {{
             addListener(new RunListener() {
                 @Override
-                public void testFailure(Failure failure) throws Exception {
+                public void testFailure(Failure failure) {
                     fail(failure.getMessage());
                 }
 
@@ -117,5 +119,12 @@ public class TraitsTest {
         }});
 
         assertEquals(2, testsRun.get());
+    }
+
+    @Test
+    public void supportsMultipleTraitsFromCommonlyInheritedAncestor() throws InitializationError {
+        Traits                traits           = new Traits(TestSuiteTwoInheritedTraitMethods.class);
+        List<FrameworkMethod> frameworkMethods = traits.computeTestMethods();
+        assertEquals(2, frameworkMethods.size());
     }
 }
