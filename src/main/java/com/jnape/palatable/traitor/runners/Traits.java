@@ -7,6 +7,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Traits extends BlockJUnit4ClassRunner {
@@ -17,7 +18,7 @@ public class Traits extends BlockJUnit4ClassRunner {
 
     @Override
     protected List<FrameworkMethod> computeTestMethods() {
-        List<FrameworkMethod> testMethods = super.computeTestMethods();
+        List<FrameworkMethod> testMethods = new ArrayList<>(super.computeTestMethods());
         addTraitTestingMethods(testMethods);
         return testMethods;
     }
