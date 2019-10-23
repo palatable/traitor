@@ -51,6 +51,11 @@ public class TraitFrameworkMethod extends FrameworkMethod {
                 && traitClass.equals(((TraitFrameworkMethod) other).traitClass);
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
     public static TraitFrameworkMethod synthesize(Class<? extends Trait> traitClass,
                                                   Object testSubject)
             throws TraitFrameworkMethodSynthesisException {

@@ -8,12 +8,20 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+
+import static java.util.Arrays.asList;
 
 public class Traits extends BlockJUnit4ClassRunner {
 
+    private final List<FrameworkMethod> computedTestMethods;
+
     public Traits(Class<?> testClass) throws InitializationError {
         super(testClass);
+        this.computedTestMethods = new ArrayList<>();
     }
 
     @Override
@@ -24,19 +32,29 @@ public class Traits extends BlockJUnit4ClassRunner {
     }
 
     private void addTraitTestingMethods(List<FrameworkMethod> testMethods) {
-        List<FrameworkMethod> traitTestSubjectCreationMethods = getTestClass().getAnnotatedMethods(TestTraits.class);
-        for (FrameworkMethod traitTestSubjectCreationMethod : traitTestSubjectCreationMethods)
+        List<FrameworkMethod> traitAnnotatedMethods = getTestClass().getAnnotatedMethods(TestTraits.class);
+        for (FrameworkMethod traitAnnotatedMethod : traitAnnotatedMethods)
             try {
-                Object testSubject = traitTestSubjectCreationMethod.invokeExplosively(createTest());
-                for (Class<? extends Trait> traitClass : traitTestSubjectCreationMethod.getAnnotation(TestTraits.class).value()) {
-                    TraitFrameworkMethod traitFrameworkMethod = TraitFrameworkMethod.synthesize(traitClass, testSubject);
-                    testMethods.remove(traitFrameworkMethod);
-                    testMethods.add(traitFrameworkMethod);
-                }
+                Object                   testSubject = traitAnnotatedMethod.invokeExplosively(createTest());
+                Class<? extends Trait>[] traits      = traitAnnotatedMethod.getAnnotation(TestTraits.class).value();
+                testMethods.addAll(synthesizeTraitFrameworkMethods(new LinkedList<>(asList(traits)), testSubject));
             } catch (Throwable t) {
                 t.printStackTrace();
                 throw new AssertionError("Couldn't create a test subject");
             }
     }
 
+    private static Set<TraitFrameworkMethod> synthesizeTraitFrameworkMethods(
+            LinkedList<Class<? extends Trait>> traitClasses, Object testSubject) {
+        LinkedHashSet<TraitFrameworkMethod> traitFrameworkMethods = new LinkedHashSet<>();
+        while (!traitClasses.isEmpty()) {
+            Class<? extends Trait> traitClass = traitClasses.poll();
+            traitFrameworkMethods.add(TraitFrameworkMethod.synthesize(traitClass, testSubject));
+            TestTraits testTraits = traitClass.getAnnotation(TestTraits.class);
+            if (testTraits != null) {
+                traitClasses.addAll(0, asList(testTraits.value()));
+            }
+        }
+        return traitFrameworkMethods;
+    }
 }
